@@ -17,7 +17,7 @@ void semaphore_init(Semaphore *s, int value) {
 //Implementacion de la espera del semaforo
 void semaphore_wait(Semaphore *s) {
     pthread_mutex_lock(&s->mutex);  //Bloquea el mutex
-    while (s->value <= 0) {  //Si el valor del semaforo es 0 o negativo, el hilo debe esperar
+    if (s->value <= 0) {  //Si el valor del semaforo es 0 o negativo, el hilo debe esperar
         pthread_cond_wait(&s->cond, &s->mutex);  //Espera en la variable de condicion
     }
     s->value--;
@@ -48,7 +48,7 @@ void barrier_wait(Barrier *b) {
         b->waiting = 0;  //Reinicia el contador
         pthread_cond_broadcast(&b->cond);  //Notifica a todos los hilos que la barrera esta completa
     } else {
-        while (pthread_cond_wait(&b->cond, &b->mutex) != 0);  //La variable de condicion espera hasta que la barrera este completa
+        pthread_cond_wait(&b->cond, &b->mutex);  //La variable de condicion espera hasta que la barrera este completa
     }
     pthread_mutex_unlock(&b->mutex);
 }
@@ -84,5 +84,4 @@ void monitor_notify_all(Monitor *m) {
     pthread_cond_broadcast(&m->cond);
 }
 
-// last test..
-
+// last test --while..
